@@ -17,7 +17,9 @@ project(':job-dsl-core') {
 defaultTasks 'build' // For BuildHive
 
 subprojects {
-    group = 'org.jenkins-ci.plugins'
+    group='hu.rxd'
+    // group = 'org.jenkins-ci.plugins'
+
     apply plugin: 'groovy'
     apply plugin: 'idea'
     apply plugin: 'maven' // For artifactory publishing
@@ -36,9 +38,11 @@ subprojects {
 }
 
 project(':job-dsl-core') {
-    apply plugin: 'application'
 
-    description = "Generates Jenkins jobs via a DSL"
+    apply plugin: 'application'
+    apply plugin: 'signing'
+
+    description = "Generates Jenkins jobs via a DSL - THIS IS A PACKAGE REBIND original:https://github.com/jenkinsci/job-dsl-plugin"
     dependencies {
         compile 'org.slf4j:slf4j-simple:1.4.3' // For perforce
         compile 'commons-codec:commons-codec:1.8' // For perforce
@@ -73,11 +77,15 @@ project(':job-dsl-core') {
         mainClass = project.mainClassName
     }
 
+    signing {
+        sign configurations.archives
+    }
+
     artifacts {
         archives jarJavadocs
         archives jarGroovydocs
         archives jarSources
-        archives oneJar
+//        archives oneJar
     }
 
     run {
@@ -92,13 +100,67 @@ project(':job-dsl-core') {
             uploadArchives {
                 repositories {
                     mavenDeployer {
-                        def credentials = loadCredentialsForJenkinsCommunityRepository()
+                        beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
+//                        def credentials = loadCredentialsForJenkinsCommunityRepository()
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+			  authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+			  authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+/*
                         repository(url: 'http://maven.jenkins-ci.org:8081/content/repositories/releases') {
                             authentication(credentials)
                         }
                         snapshotRepository(url: 'http://maven.jenkins-ci.org:8081/content/repositories/snapshots') {
                             authentication(credentials)
                         }
+*/
+				pom.project {
+			   name 'job-dsl-core'
+			   packaging 'jar'
+			   description 'Javaposse jenkins job-dsl-core'
+			   url 'https://github.com/kgyrtkirk/job-dsl-core'
+ 
+			   scm {
+				   url 'https://github.com/kgyrtkirk/job-dsl-core.git'
+				   connection 'scm:https://github.com/kgyrtkirk/job-dsl-core.git'
+				   developerConnection 'scm:git@github.com/kgyrtkirk/job-dsl-core.git'
+			   }
+ 
+			   licenses {
+				   license {
+					   name 'The Apache Software License, Version 2.0'
+					   url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					   distribution 'repo'
+				   }
+			   }
+ 
+			   developers {
+				   developer {
+					   id 'jryan'
+					   name 'Justin Ryan'
+					   email 'jryan@netflix.com'
+				   }
+				   developer {
+					   id 'andrew'
+					   name 'Andrew Harmel-Law'
+					   email 'andrew@harmel-law.com'
+				   }
+				   developer {
+					   id 'sit'
+					   name 'Emil Sit'
+					   email 'sit@hadapt.com'
+				   }
+				   developer {
+					   id 'kirk'
+					   name 'Zoltan Nagy'
+					   email 'kirk@rxd.hu'
+				   }
+			   }
+		   }
+
                     }
                 }
             }
@@ -124,6 +186,7 @@ project(':job-dsl-plugin') {
     description = "This plugin allows definition of Jobs via a DSL, using existing Jobs as a template."
     dependencies {
         compile project(':job-dsl-core')
+        compile 'org.codehaus.groovy:groovy-all:1.8.6'
     }
 }
 
