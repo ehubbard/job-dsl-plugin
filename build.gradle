@@ -23,8 +23,9 @@ subprojects {
     apply plugin: 'groovy'
     apply plugin: 'idea'
     apply plugin: 'maven' // For artifactory publishing
-    sourceCompatibility = 1.5
-    targetCompatibility = 1.5
+    apply plugin: 'eclipse'
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
 
     dependencies {
         compile 'org.codehaus.groovy:groovy-all:1.8.6'
@@ -41,7 +42,6 @@ project(':job-dsl-core') {
 
     apply plugin: 'application'
     apply plugin: 'signing'
-    apply plugin: 'eclipse'
 
     sourceCompatibility = 1.6
     targetCompatibility = 1.6
