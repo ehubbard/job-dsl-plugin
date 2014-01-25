@@ -197,3 +197,4 @@ project(':job-dsl-plugin') {
 task wrapper(type: Wrapper) { gradleVersion = '1.8' }
 
 apply from: './job-dsl-plugin/ide.gradle'
+
