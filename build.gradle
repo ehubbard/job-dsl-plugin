@@ -41,8 +41,12 @@ project(':job-dsl-core') {
 
     apply plugin: 'application'
     apply plugin: 'signing'
+    apply plugin: 'eclipse'
 
-    description = "Generates Jenkins jobs via a DSL - THIS IS A PACKAGE REBIND original:https://github.com/jenkinsci/job-dsl-plugin"
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+
+    description = "Generates Jenkins jobs via a DSL (fork)"
     dependencies {
         compile 'org.slf4j:slf4j-simple:1.4.3' // For perforce
         compile 'commons-codec:commons-codec:1.8' // For perforce
