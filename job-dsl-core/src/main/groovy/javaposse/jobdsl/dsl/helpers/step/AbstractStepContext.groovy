@@ -40,21 +40,10 @@ class AbstractStepContext implements Context {
         }
     }
 
-    def gradle(String tasksArg){
-        gradle(tasksArg,null,null)
-    }
-    
-    def gradle(String tasksArg=null, String switchesArg=null, Closure gradleClosure) {
+    def gradle(Closure gradleClosure) {
         GradleContext gradleContext = new GradleContext()
-        if(gradleClosure!=null){
+        if(gradleClosure!=null) {
             AbstractContextHelper.executeInContext(gradleClosure, gradleContext)
-        }
-        
-        if(switchesArg){
-            gradleContext.switches = switchesArg
-        }
-        if(tasksArg){
-            gradleContext.tasks = tasksArg
         }
         
         def nodeBuilder = new NodeBuilder()
@@ -65,15 +54,20 @@ class AbstractStepContext implements Context {
             rootBuildScriptDir gradleContext.rootBuildScriptDir
             buildFile gradleContext.buildFile
             useWrapper gradleContext.useWrapper.toString()
-            if(gradleContext.fromRootBuildScriptDir!=null){
+            if(gradleContext.fromRootBuildScriptDir != null) {
                 fromRootBuildScriptDir gradleContext.fromRootBuildScriptDir.toString()
             }
-            if(gradleContext.makeExecutable!=null){
+            if(gradleContext.makeExecutable!=null) {
                 makeExecutable gradleContext.makeExecutable.toString()
             }
-            if(gradleContext.gradleName != null){
+            if(gradleContext.gradleName != null) {
                 gradleName gradleContext.gradleName
             }
+        }
+        // Apply Context
+        if (gradleContext.configureBlock) {
+            WithXmlAction action = new WithXmlAction(gradleContext.configureBlock)
+            action.execute(gradleNode)
         }
         stepNodes << gradleNode
     }
@@ -89,23 +83,19 @@ class AbstractStepContext implements Context {
      <wrapperScript/>
      </hudson.plugins.gradle.Gradle>
      */
-    def gradle(String tasksArg, String switchesArg, Boolean useWrapperArg=null, Closure configure=null) {
-        def nodeBuilder = new NodeBuilder()
-        def gradleNode = nodeBuilder.'hudson.plugins.gradle.Gradle' {
-            description ''
-            switches switchesArg?:''
-            tasks tasksArg?:''
-            rootBuildScriptDir ''
-            buildFile ''
-            useWrapper useWrapperArg==null?'true':useWrapperArg.toString()
-            wrapperScript ''
+    def gradle(String tasksArg, String switchesArg=null, Boolean useWrapperArg=null, Closure configure=null) {
+        gradle {
+            if(tasksArg!=null) {
+                tasks tasksArg
+            }
+            if(switchesArg!=null) {
+                switches switchesArg
+            }
+            if(useWrapperArg!=null) {
+                useWrapper useWrapperArg
+            }
+            delegate.configure(configure)
         }
-        // Apply Context
-        if (configure) {
-            WithXmlAction action = new WithXmlAction(configure)
-            action.execute(gradleNode)
-        }
-        stepNodes << gradleNode
     }
 
     /**
