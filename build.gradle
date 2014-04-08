@@ -28,9 +28,9 @@ subprojects {
     targetCompatibility = 1.6
 
     dependencies {
-        compile 'org.codehaus.groovy:groovy-all:1.8.+'
+        compile 'org.codehaus.groovy:groovy-all:2.0.+'
         compile 'com.google.guava:guava:14.0.1'
-        testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
+        testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
         testCompile 'junit:junit-dep:4.10'
         testCompile 'cglib:cglib-nodep:2.2.2' // Used by Spock
         testCompile 'org.objenesis:objenesis:1.2' // Used by Spock
