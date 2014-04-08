@@ -39,13 +39,21 @@ class AbstractStepContext implements Context {
             'command' commandStr
         }
     }
-
+    /**
+     * <hudson.plugins.gradle.Gradle>
+     * <description>descr</description>
+     * <switches>--refresh-dependencies</switches>
+     * <tasks>task1 task2</tasks>
+     * <rootBuildScriptDir>master</rootBuildScriptDir>
+     * <buildFile/>
+     * <useWrapper>true</useWrapper>
+     * <fromRootBuildScriptDir>true</fromRootBuildScriptDir>
+     * </hudson.plugins.gradle.Gradle>
+     */
     def gradle(Closure gradleClosure) {
         GradleContext gradleContext = new GradleContext()
-        if(gradleClosure!=null) {
-            AbstractContextHelper.executeInContext(gradleClosure, gradleContext)
-        }
-        
+        AbstractContextHelper.executeInContext(gradleClosure, gradleContext)
+
         def nodeBuilder = new NodeBuilder()
         def gradleNode = nodeBuilder.'hudson.plugins.gradle.Gradle' {
             description gradleContext.description
@@ -54,13 +62,13 @@ class AbstractStepContext implements Context {
             rootBuildScriptDir gradleContext.rootBuildScriptDir
             buildFile gradleContext.buildFile
             useWrapper gradleContext.useWrapper.toString()
-            if(gradleContext.fromRootBuildScriptDir != null) {
+            if (gradleContext.fromRootBuildScriptDir != null) {
                 fromRootBuildScriptDir gradleContext.fromRootBuildScriptDir.toString()
             }
-            if(gradleContext.makeExecutable!=null) {
+            if (gradleContext.makeExecutable != null) {
                 makeExecutable gradleContext.makeExecutable.toString()
             }
-            if(gradleContext.gradleName != null) {
+            if (gradleContext.gradleName != null) {
                 gradleName gradleContext.gradleName
             }
         }
@@ -83,7 +91,7 @@ class AbstractStepContext implements Context {
      <wrapperScript/>
      </hudson.plugins.gradle.Gradle>
      */
-    def gradle(String tasksArg, String switchesArg=null, Boolean useWrapperArg=null, Closure configure=null) {
+    def gradle(String tasksArg = null, String switchesArg = null, boolean useWrapperArg = true, Closure configure = null) {
         gradle {
             if(tasksArg!=null) {
                 tasks tasksArg
